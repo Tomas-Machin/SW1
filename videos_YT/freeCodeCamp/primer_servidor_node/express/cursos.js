@@ -33,7 +33,7 @@ let infoCursos = {
         {
             id: 2,
             titulo: 'Aprende Algebra',
-            tema: 'Algebra',
+            tema: 'algebra',
             vistas: 15722,
             nivel: 'intermedio'}
     ]
