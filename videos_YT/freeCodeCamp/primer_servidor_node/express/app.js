@@ -4,7 +4,11 @@ const app = express();  // retorna una aplicacion de express
 const { infoCursos } = require('./cursos');
 const PORT = process.env.PORT || 3000;
 
-
+// Routers
+const routerProgramacion = express.Router();
+const routerMatematicas = express.Router();
+app.use('/api/cursos/programacion', routerProgramacion);
+app.use('/api/cursos/matematicas', routerMatematicas);
 
 // ROUTING
 app.get('/', (req, res) => {
@@ -15,14 +19,15 @@ app.get('/api/cursos', (req, res) => {
     res.send(JSON.stringify(infoCursos));
 });
 
-app.get('/api/cursos/programacion', (req, res) => {
+// PROGRAMACION
+routerProgramacion.get('/', (req, res) => {     // porque la ruta ya esta definida como /api/cursos/programacion y solo se añadiria lo siguiente
     res.send(JSON.stringify(infoCursos.programacion));
 });
 
 // manejar solicitudes de lenguajes de programacion (teniendo en cuenta que hay cientos)
 // app.get('/api/cursos/programacion/python', (req, res) => {});    // esto no pq habria q hacer uno por cada lenguaje
 // habria que hacer con parametros URL -> permiten generalizar un valor
-app.get('/api/cursos/programacion/:lenguaje', (req, res) => {   // parametro URL -> :lenguaje (se identifica por ':')
+routerProgramacion.get('/:lenguaje', (req, res) => {   // parametro URL -> :lenguaje (se identifica por ':')
     const lenguaje = req.params.lenguaje;   // lenguaje en req.params.lenguaje es el que hemos puesto como parametro URL
     const resultado = infoCursos.programacion.filter(curso => curso.lenguaje === lenguaje);
     // puede estar vacio asi q lo comprobamos
@@ -36,15 +41,7 @@ app.get('/api/cursos/programacion/:lenguaje', (req, res) => {   // parametro URL
     res.send(JSON.stringify(resultado));
 });
 
-app.get('/api/cursos/matematicas/:tema', (req, res) => {
-    const tema = req.params.tema;
-    const resultado = infoCursos.matematicas.filter(curso => curso.tema === tema);
-    if (resultado.length === 0) return res.status(404).send(`No se encontraron cursos de ${tema}`);
-
-    res.send(JSON.stringify(resultado));
-});
-
-app.get('/api/cursos/programacion/:lenguaje/:nivel', (req, res) => {
+routerProgramacion.get('/:lenguaje/:nivel', (req, res) => {
     const lenguaje = req.params.lenguaje;
     const nivel = req.params.nivel;
     const resultado = infoCursos.programacion.filter(curso => curso.lenguaje === lenguaje && curso.nivel === nivel);
@@ -53,11 +50,19 @@ app.get('/api/cursos/programacion/:lenguaje/:nivel', (req, res) => {
     res.send(JSON.stringify(resultado));
 });
 
-
-app.get('/api/cursos/matematicas', (req, res) => {
+// MATEMATICAS
+routerMatematicas.get('/', (req, res) => {
     res.send(JSON.stringify(infoCursos.matematicas));
 });
 
 app.listen(PORT, () => {
     console.log(`El servidor esta escuchando en http://localhost:${PORT}`);
+});
+
+routerMatematicas.get('/:tema', (req, res) => {
+    const tema = req.params.tema;
+    const resultado = infoCursos.matematicas.filter(curso => curso.tema === tema);
+    if (resultado.length === 0) return res.status(404).send(`No se encontraron cursos de ${tema}`);
+
+    res.send(JSON.stringify(resultado));
 });
